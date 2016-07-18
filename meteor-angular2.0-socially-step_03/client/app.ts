@@ -1,28 +1,32 @@
 import 'reflect-metadata';
-import { Component } from '@angular/core';
+import { Component, provide } from '@angular/core';
 import { bootstrap } from 'angular2-meteor-auto-bootstrap';
-import { Parties }   from '../collections/parties';
-import { Mongo }     from 'meteor/mongo';
-import { PartiesForm } from '../collections/imports/parties-form/parties-form';
 import { provideRouter, RouterConfig, ROUTER_DIRECTIVES } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+import { PartiesList } from '../collections/imports/parties-list/parties-list.ts';
+import { PartyDetails } from '../collections/imports/party-details/party-details.ts';
+
+
  
 import template from './app.html';
 
 @Component({
   selector: 'app',
   template,
-  directives: [PartiesForm, ROUTER_DIRECTIVES]
+  directives: [ROUTER_DIRECTIVES]
 })
-class Socially {
-  parties: Mongo.Cursor<Object>;
 
-  constructor () {
-    this.parties = Parties.find();
-  }
+class Socially {}
 
-  removeParty(party) {
-    Parties.remove(party._id);
-  }
-}
 
-bootstrap(Socially);
+const routes: RouterConfig = [
+  { path : '',                component: PartiesList},
+  { path : 'party/:partyId',   component: PartyDetails},
+];
+
+const APP_ROUTER_PROVIDERS = [
+  provideRouter(routes)
+];
+
+
+bootstrap(Socially, [APP_ROUTER_PROVIDERS, provide(APP_BASE_HREF, { useValue: '/' })]);
